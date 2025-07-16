@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tufted Rug Pricing Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+        .setup-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s;
+        }
+
+        .input-group:hover {
+            border-color: #3498db;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .results-section {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .result-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .final-price {
+            background: rgba(255,255,255,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .breakdown-section {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .code-section {
+            background: #f1f2f6;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .formula-display {
+            background: #2f3542;
+            color: #a4b0be;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧵 Tufted Rug Pricing Calculator</h1>
+
+        <div class="setup-section">
+            <h2>📋 How to Set This Up in Google Sheets</h2>
+            <p><strong>Step 1:</strong> Open Google Sheets and create a new spreadsheet</p>
+            <p><strong>Step 2:</strong> Create three sheets: "Calculator", "Settings", and "Project History"</p>
+            <p><strong>Step 3:</strong> Copy the formulas and structure provided below</p>
+            <p><strong>Step 4:</strong> Customize the rates in the Settings sheet to match your local costs</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label>Rug Length (feet):</label>
+                <input type="number" id="length" value="3" min="1" max="20" step="0.5">
+            </div>
+
+            <div class="input-group">
+                <label>Rug Width (feet):</label>
+                <input type="number" id="width" value="2" min="1" max="20" step="0.5">
+            </div>
+
+            <div class="input-group">
+                <label>Complexity Level:</label>
+                <select id="complexity">
+                    <option value="simple">Simple (solid colors, basic shapes)</option>
+                    <option value="medium" selected>Medium (2-3 colors, geometric)</option>
+                    <option value="complex">Complex (portraits, fine details)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Pile Type:</label>
+                <select id="pileType">
+                    <option value="loop">Loop Pile (loops intact)</option>
+                    <option value="cut" selected>Cut Pile (trimmed loops)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Experience Level:</label>
+                <select id="experience">
+                    <option value="beginner">Beginner (Rugs 1-5)</option>
+                    <option value="intermediate" selected>Intermediate (Rugs 6-15)</option>
+                    <option value="advanced">Advanced (Rugs 16+)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Rush Order:</label>
+                <select id="rushOrder">
+                    <option value="no" selected>No Rush</option>
+                    <option value="yes">Rush Order (+25%)</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculatePrice()">Calculate Price</button>
+
+        <div class="results-section" id="results" style="display: none;">
+            <h2>💰 Price Breakdown</h2>
+            <div class="results-grid">
+                <div class="result-item">
+                    <div class="result-label">Base Materials</div>
+                    <div class="result-value" id="baseMaterials">KSh 0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">With Overhead (40%)</div>
+                    <div class="result-value" id="withOverhead">KSh 0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Labor Cost</div>
+                    <div class="result-value" id="laborCost">KSh 0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Profit Margin</div>
+                    <div class="result-value" id="profit">KSh 0</div>
+                </div>
+            </div>
+
+            <div class="final-price">
+                <div class="result-label">FINAL PRICE</div>
+                <div class="result-value" id="finalPrice" style="font-size: 32px;">KSh 0</div>
+            </div>
+
+            <div class="breakdown-section">
+                <h3>📊 Detailed Breakdown</h3>
+                <div class="breakdown-item">
+                    <span>Rug Size:</span>
+                    <span id="rugSize">0 sq ft (0 m²)</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Tuft Cloth:</span>
+                    <span id="tuftCloth">KSh 0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Yarn Cost:</span>
+                    <span id="yarnCost">KSh 0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Glue Cost:</span>
+                    <span id="glueCost">KSh 0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Backing & Grip:</span>
+                    <span id="backingCost">KSh 0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Estimated Hours:</span>
+                    <span id="estimatedHours">0 hours</span>
+                </div>
+                <div class="breakdown-item">
+                    <span>Hourly Rate:</span>
+                    <span id="hourlyRate">KSh 0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-section">
+            <h2>📝 Google Sheets Setup Guide</h2>
+
+            <h3>Sheet 1: Calculator (Main Interface)</h3>
+            <p>Create this layout in your first sheet:</p>
+            <div class="formula-display">
+A1: "TUFTED RUG PRICING CALCULATOR"
+A3: "PROJECT DETAILS"
+A4: "Length (feet):"        B4: [Input cell]
+A5: "Width (feet):"         B5: [Input cell]
+A6: "Complexity:"           B6: [Dropdown: Simple, Medium, Complex]
+A7: "Pile Type:"            B7: [Dropdown: Loop, Cut]
+A8: "Experience Level:"     B8: [Dropdown: Beginner, Intermediate, Advanced]
+A9: "Rush Order:"           B9: [Dropdown: No, Yes]
+
+A11: "CALCULATIONS"
+A12: "Rug Area (sq ft):"    B12: =B4*B5
+A13: "Rug Area (m²):"       B13: =B12*0.092903
+A14: "Base Materials:"      B14: =Settings!B2*B13*1.15 + IF(B7="Cut",B12/0.2,B12/0.3)*Settings!B3 + B12*Settings!B4 + B13*Settings!B5 + Settings!B6
+A15: "With Overhead:"       B15: =B14*1.4
+A16: "Labor Hours:"         B16: =Settings!C2 + (IF(B6="Simple",Settings!D2,IF(B6="Medium",Settings!E2,Settings!F2)) * IF(B8="Beginner",1.5,IF(B8="Intermediate",1.25,1)))
+A17: "Labor Cost:"          B17: =B16*Settings!G2
+A18: "Subtotal:"            B18: =B15+B17
+A19: "Profit:"              B19: =B18*IF(B6="Simple",0.15,IF(B6="Medium",0.2,0.25))
+A20: "Rush Premium:"        B20: =IF(B9="Yes",B18*0.25,0)
+A21: "FINAL PRICE:"         B21: =B18+B19+B20
+            </div>
+
+            <h3>Sheet 2: Settings (Rate Configuration)</h3>
+            <p>Set up your rates and constants in the second sheet:</p>
+            <div class="formula-display">
+A1: "MATERIAL RATES"
+A2: "Tuft Cloth (KSh/m²):"     B2: 1000
+A3: "Yarn (KSh/skein):"        B3: 100
+A4: "Glue (KSh/sq ft):"        B4: 45
+A5: "Backing (KSh/m²):"        B5: 400
+A6: "Miscellaneous:"           B6: 300
+
+A8: "TIME ESTIMATES"
+A9: "Finishing Hours:"         C2: 2.5
+A10: "Customer Service:"       C3: 0.5
+A11: "Simple Tufting:"         D2: 2.5
+A12: "Medium Tufting:"         E2: 4.5
+A13: "Complex Tufting:"        F2: 8
+
+A15: "LABOR RATES"
+A16: "Hourly Rate (KSh):"      G2: 375
+            </div>
+
+            <h3>Sheet 3: Project History (Auto-logging)</h3>
+            <p>Track your quotes and refine your estimates:</p>
+            <div class="formula-display">
+A1: "Date"    B1: "Size"    C1: "Complexity"    D1: "Quote"    E1: "Actual Hours"    F1: "Notes"
+// Each row logs a new project automatically when you calculate
+            </div>
+
+            <h3>🔧 Advanced Features to Add</h3>
+            <p><strong>Data Validation:</strong> Create dropdown menus using Data > Data Validation</p>
+            <p><strong>Conditional Formatting:</strong> Highlight rush orders in red, profitable projects in green</p>
+            <p><strong>Charts:</strong> Add profit margin analysis and time tracking graphs</p>
+            <p><strong>Mobile Optimization:</strong> Freeze the top rows and use larger fonts for mobile viewing</p>
+        </div>
+    </div>
+
+    <script>
+        // Demonstration calculator (this shows how the Google Sheets will work)
+        function calculatePrice() {
+            const length = parseFloat(document.getElementById('length').value);
+            const width = parseFloat(document.getElementById('width').value);
+            const complexity = document.getElementById('complexity').value;
+            const pileType = document.getElementById('pileType').value;
+            const experience = document.getElementById('experience').value;
+            const rushOrder = document.getElementById('rushOrder').value;
+
+            // Material rates (these would be in your Settings sheet)
+            const rates = {
+                tuftCloth: 1000, // KSh per m²
+                yarn: 100, // KSh per skein
+                glue: 45, // KSh per sq ft
+                backing: 400, // KSh per m²
+                misc: 300,
+                hourlyRate: 375
+            };
+
+            // Time estimates by complexity
+            const timeEstimates = {
+                simple: 2.5,
+                medium: 4.5,
+                complex: 8
+            };
+
+            // Experience multipliers
+            const experienceMultipliers = {
+                beginner: 1.5,
+                intermediate: 1.25,
+                advanced: 1.0
+            };
+
+            // Profit margins by complexity
+            const profitMargins = {
+                simple: 0.15,
+                medium: 0.20,
+                complex: 0.25
+            };
+
+            // Calculate areas
+            const areaFt = length * width;
+            const areaM2 = areaFt * 0.092903;
+
+            // Calculate base materials
+            const tuftClothCost = areaM2 * rates.tuftCloth * 1.15; // 15% waste factor
+            const yarnCoverage = pileType === 'cut' ? 0.2 : 0.3; // sq ft per skein
+            const yarnCost = (areaFt / yarnCoverage) * rates.yarn;
+            const glueCost = areaFt * rates.glue;
+            const backingCost = areaM2 * rates.backing;
+            const baseMaterials = tuftClothCost + yarnCost + glueCost + backingCost + rates.misc;
+
+            // Apply overhead
+            const withOverhead = baseMaterials * 1.4;
+
+            // Calculate labor
+            const baseTuftingTime = timeEstimates[complexity];
+            const finishingTime = 2.5;
+            const customerServiceTime = 0.5;
+            const experienceMultiplier = experienceMultipliers[experience];
+            const totalHours = (baseTuftingTime + finishingTime + customerServiceTime) * experienceMultiplier;
+            const laborCost = totalHours * rates.hourlyRate;
+
+            // Calculate profit and final price
+            const subtotal = withOverhead + laborCost;
+            const profit = subtotal * profitMargins[complexity];
+            const rushPremium = rushOrder === 'yes' ? subtotal * 0.25 : 0;
+            const finalPrice = subtotal + profit + rushPremium;
+
+            // Display results
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('baseMaterials').textContent = `KSh ${Math.round(baseMaterials).toLocaleString()}`;
+            document.getElementById('withOverhead').textContent = `KSh ${Math.round(withOverhead).toLocaleString()}`;
+            document.getElementById('laborCost').textContent = `KSh ${Math.round(laborCost).toLocaleString()}`;
+            document.getElementById('profit').textContent = `KSh ${Math.round(profit).toLocaleString()}`;
+            document.getElementById('finalPrice').textContent = `KSh ${Math.round(finalPrice).toLocaleString()}`;
+
+            // Display breakdown
+            document.getElementById('rugSize').textContent = `${areaFt} sq ft (${areaM2.toFixed(2)} m²)`;
+            document.getElementById('tuftCloth').textContent = `KSh ${Math.round(tuftClothCost).toLocaleString()}`;
+            document.getElementById('yarnCost').textContent = `KSh ${Math.round(yarnCost).toLocaleString()}`;
+            document.getElementById('glueCost').textContent = `KSh ${Math.round(glueCost).toLocaleString()}`;
+            document.getElementById('backingCost').textContent = `KSh ${Math.round(backingCost).toLocaleString()}`;
+            document.getElementById('estimatedHours').textContent = `${totalHours.toFixed(1)} hours`;
+            document.getElementById('hourlyRate').textContent = `KSh ${rates.hourlyRate}`;
+
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
