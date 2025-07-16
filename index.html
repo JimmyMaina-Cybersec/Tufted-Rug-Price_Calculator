@@ -1,80 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tufted Rug Pricing Calculator</title>
-    <style>
-        /* ... existing CSS unchanged ... */
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tufted Rug Pricing Calculator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    h1, h2, h3 {
+      color: #2c3e50;
+    }
+    .settings-section, .input-section, .results-section {
+      margin-bottom: 30px;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .settings-section {
+      background: #f0f4f8;
+      border-left: 5px solid #e67e22;
+    }
+    .settings-section input {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+    }
+    .input-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .input-group {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid #e9ecef;
+      transition: border-color 0.3s;
+    }
+    .input-group:hover {
+      border-color: #3498db;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #34495e;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .calculate-btn, .save-settings-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      display: inline-block;
+      margin-top: 10px;
+    }
+    .calculate-btn:hover, .save-settings-btn:hover {
+      transform: translateY(-2px);
+    }
+    .results-section {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: white;
+    }
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .result-item {
+      background: rgba(255,255,255,0.2);
+      padding: 15px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+    }
+    .final-price {
+      background: rgba(255,255,255,0.3);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 20px;
+    }
+    @media (max-width: 768px) {
+      .input-section, .results-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🧵 Tufted Rug Pricing Calculator</h1>
+  <div class="container">
+    <h1>🧵 Tufted Rug Pricing Calculator</h1>
 
-        <!-- SETTINGS PANEL -->
-        <div class="settings-section">
-            <h2>⚙️ Settings</h2>
-            <!-- settings inputs as before -->
-        </div>
-
-        <!-- ORDER INPUTS -->
-        <div class="input-section">
-            <!-- order inputs as before -->
-        </div>
-        <button class="calculate-btn" onclick="calculatePrice()">Calculate & Log Quote</button>
-
-        <!-- RESULTS -->
-        <div class="results-section" id="results" style="display:none;">
-            <!-- results display as before -->
-        </div>
+    <!-- SETTINGS PANEL -->
+    <div class="settings-section">
+      <h2>⚙️ Settings</h2>
+      <label>Tuft Cloth (KSh/m²): <input type="number" id="tuftCloth" value="1000"></label>
+      <label>Yarn (KSh/skein): <input type="number" id="yarn" value="100"></label>
+      <label>Glue (KSh per 750ml): <input type="number" id="gluePer750ml" value="450"></label>
+      <label>Glue Usage (ml/m²): <input type="number" id="glueUsage" value="500"></label>
+      <label>Backing (KSh/m²): <input type="number" id="backing" value="400"></label>
+      <label>Miscellaneous (KSh): <input type="number" id="miscCost" value="300"></label>
+      <label>Hourly Rate (KSh): <input type="number" id="hourlyRate" value="375"></label>
     </div>
 
-    <script>
-        // DEFAULT SETTINGS and load/save functions (unchanged)
+    <!-- ORDER INPUTS -->
+    <div class="input-section">
+      <div class="input-group"><label>Length (ft)</label><input type="number" id="length" value="3"></div>
+      <div class="input-group"><label>Width (ft)</label><input type="number" id="width" value="2"></div>
+      <div class="input-group"><label>Complexity</label><select id="complexity"><option value="simple">Simple</option><option value="medium" selected>Medium</option><option value="complex">Complex</option></select></div>
+      <div class="input-group"><label>Pile Type</label><select id="pile"><option value="loop">Loop</option><option value="cut" selected>Cut</option></select></div>
+      <div class="input-group"><label>Experience</label><select id="experience"><option value="beginner">Beginner</option><option value="intermediate" selected>Intermediate</option><option value="advanced">Advanced</option></select></div>
+      <div class="input-group"><label>Rush Order</label><select id="rush"><option value="no" selected>No</option><option value="yes">Yes</option></select></div>
+    </div>
+    <button class="calculate-btn" onclick="calculatePrice()">Calculate & Log Quote</button>
 
-        async function calculatePrice() {
-            // ... calculation logic unchanged ...
-            const quoteData = {
-                timestamp: new Date().toISOString(),
-                size: `${length}×${width}`,
-                complexity,
-                pile: pileType,
-                experience,
-                rush: rushOrder,
-                materials: Math.round(baseMat),
-                overhead: Math.round(withOH - baseMat),
-                labor: Math.round(labor),
-                profit: Math.round(profit),
-                finalPrice: Math.round(final)
-            };
+    <!-- RESULTS -->
+    <div class="results-section" id="results" style="display:none;">
+      <h2>💰 Results</h2>
+      <div class="results-grid">
+        <div class="result-item"><div>Base Materials</div><div id="baseMaterials"></div></div>
+        <div class="result-item"><div>With Overhead</div><div id="withOverhead"></div></div>
+        <div class="result-item"><div>Labor Cost</div><div id="laborCost"></div></div>
+        <div class="result-item"><div>Profit</div><div id="profit"></div></div>
+      </div>
+      <div class="final-price"><h3>FINAL PRICE</h3><div id="finalPrice" style="font-size:32px;"></div></div>
+    </div>
+  </div>
 
-            // 1) Display results
-            displayResults(quoteData);
+  <script>
+    async function calculatePrice() {
+      const length = parseFloat(document.getElementById('length').value);
+      const width = parseFloat(document.getElementById('width').value);
+      const complexity = document.getElementById('complexity').value;
+      const pileType = document.getElementById('pile').value;
+      const experience = document.getElementById('experience').value;
+      const rushOrder = document.getElementById('rush').value;
 
-            // 2) Send to Google Sheets
-            try {
-                const response = await fetch('https://script.google.com/macros/s/AKfycbxJRHqOpNS0BzdzLtobauCEmZbW80-s82tG571dz-yLbEnhIHRVq8_ckpvNU5jCxZnh/exec', {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(quoteData)
-                });
-                console.log('Logged to Sheets');
-            } catch (err) {
-                console.error('Error logging to Sheets', err);
-            }
-        }
+      const tuftCloth = parseFloat(document.getElementById('tuftCloth').value);
+      const yarn = parseFloat(document.getElementById('yarn').value);
+      const gluePricePer750ml = parseFloat(document.getElementById('gluePer750ml').value);
+      const glueUsagePerM2 = parseFloat(document.getElementById('glueUsage').value);
+      const backing = parseFloat(document.getElementById('backing').value);
+      const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+      const misc = parseFloat(document.getElementById('miscCost').value);
 
-        function displayResults(data) {
-            document.getElementById('results').style.display='block';
-            document.getElementById('baseMaterials').textContent=`KSh ${data.materials.toLocaleString()}`;
-            document.getElementById('withOverhead').textContent=`KSh ${data.overhead.toLocaleString()}`;
-            document.getElementById('laborCost').textContent=`KSh ${data.labor.toLocaleString()}`;
-            document.getElementById('profit').textContent=`KSh ${data.profit.toLocaleString()}`;
-            document.getElementById('finalPrice').textContent=`KSh ${data.finalPrice.toLocaleString()}`;
-            // detailed breakdown updated similarly...
-        }
-    </script>
+      const areaFt = length * width;
+      const areaM2 = areaFt * 0.092903;
+
+      const tuftClothCost = areaM2 * tuftCloth * 1.15;
+      const yarnCoverage = pileType === 'cut' ? 0.2 : 0.3;
+      const yarnCost = (areaFt / yarnCoverage) * yarn;
+      const glueCost = (glueUsagePerM2 * areaM2 / 750) * gluePricePer750ml;
+      const backingCost = areaM2 * backing;
+      const baseMat = tuftClothCost + yarnCost + glueCost + backingCost + misc;
+      const withOH = baseMat * 1.4;
+
+      const timeEstimates = { simple: 2.5, medium: 4.5, complex: 8 };
+      const experienceMultipliers = { beginner: 1.5, intermediate: 1.25, advanced: 1 };
+      const profitMargins = { simple: 0.15, medium: 0.2, complex: 0.25 };
+
+      const baseTuft = timeEstimates[complexity];
+      const time = (baseTuft + 2.5 + 0.5) * experienceMultipliers[experience];
+      const labor = time * hourlyRate;
+
+      const subtotal = withOH + labor;
+      const profit = subtotal * profitMargins[complexity];
+      const final = subtotal + profit + (rushOrder === 'yes' ? subtotal * 0.25 : 0);
+
+      const quoteData = {
+        timestamp: new Date().toISOString(),
+        size: `${length}×${width}`,
+        complexity,
+        pile: pileType,
+        experience,
+        rush: rushOrder,
+        materials: Math.round(baseMat),
+        overhead: Math.round(withOH - baseMat),
+        labor: Math.round(labor),
+        profit: Math.round(profit),
+        finalPrice: Math.round(final)
+      };
+
+      displayResults(quoteData);
+
+      try {
+        await fetch('https://script.google.com/macros/s/AKfycbxJRHqOpNS0BzdzLtobauCEmZbW80-s82tG571dz-yLbEnhIHRVq8_ckpvNU5jCxZnh/exec', {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(quoteData)
+        });
+      } catch (err) {
+        console.error('Error logging to Sheets', err);
+      }
+    }
+
+    function displayResults(data) {
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('baseMaterials').textContent = `KSh ${data.materials.toLocaleString()}`;
+      document.getElementById('withOverhead').textContent = `KSh ${data.overhead.toLocaleString()}`;
+      document.getElementById('laborCost').textContent = `KSh ${data.labor.toLocaleString()}`;
+      document.getElementById('profit').textContent = `KSh ${data.profit.toLocaleString()}`;
+      document.getElementById('finalPrice').textContent = `KSh ${data.finalPrice.toLocaleString()}`;
+    }
+  </script>
 </body>
 </html>
