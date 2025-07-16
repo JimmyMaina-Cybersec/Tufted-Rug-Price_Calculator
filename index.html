@@ -134,6 +134,7 @@
       <div class="input-group"><label>Rush Order</label><select id="rush"><option value="no" selected>No</option><option value="yes">Yes</option></select></div>
     </div>
     <button class="calculate-btn" onclick="calculatePrice()">Calculate & Log Quote</button>
+    <button class="calculate-btn" onclick="downloadPDF()">Download PDF</button>
 
     <!-- RESULTS -->
     <div class="results-section" id="results" style="display:none;">
@@ -226,5 +227,46 @@
       document.getElementById('finalPrice').textContent = `KSh ${data.finalPrice.toLocaleString()}`;
     }
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const length = document.getElementById('length').value;
+    const width = document.getElementById('width').value;
+    const complexity = document.getElementById('complexity').value;
+    const pile = document.getElementById('pile').value;
+    const experience = document.getElementById('experience').value;
+    const rush = document.getElementById('rush').value;
+
+    const base = document.getElementById('baseMaterials').textContent;
+    const overhead = document.getElementById('withOverhead').textContent;
+    const labor = document.getElementById('laborCost').textContent;
+    const profit = document.getElementById('profit').textContent;
+    const final = document.getElementById('finalPrice').textContent;
+
+    const lines = [
+      '🧵 Tufted Rug Quote',
+      '-------------------------',
+      `Size: ${length} × ${width} ft`,
+      `Complexity: ${complexity}`,
+      `Pile Type: ${pile}`,
+      `Experience: ${experience}`,
+      `Rush Order: ${rush}`,
+      '',
+      `Base Materials: ${base}`,
+      `With Overhead: ${overhead}`,
+      `Labor: ${labor}`,
+      `Profit: ${profit}`,
+      '-------------------------',
+      `Final Price: ${final}`,
+    ];
+
+    lines.forEach((line, i) => doc.text(line, 20, 20 + i * 10));
+
+    doc.save(`TuftedRug_Quote_${Date.now()}.pdf`);
+  }
+</script>
 </body>
 </html>
