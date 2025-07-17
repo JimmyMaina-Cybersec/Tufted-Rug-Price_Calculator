@@ -4,92 +4,367 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tufted Rug Quote Tool</title>
-  <style>
-    /* Reset & Base */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: serif; background: #F5F0E6; color: #3A3A3A; line-height: 1.4; }
-    .container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-    .form-card, .settings-panel { position: relative; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 2rem; overflow: hidden; }
-    h1 { font-size: 1.75rem; margin-bottom: 1rem; }
-    label { display: block; margin-bottom: 0.25rem; font-size: 0.9rem; }
-    .field { margin-bottom: 1rem; }
-    input[type=number], select { width: 100%; padding: 0.6rem; border: 1px solid #C3B4A2; border-radius: 8px; font-size: 1rem; }
-    input:focus, select:focus { border-color: #B1614E; outline: none; }
-    .error-text { color: #B1614E; font-size: 0.8rem; margin-top: 0.25rem; }
-    button { font: inherit; cursor: pointer; border-radius: 8px; transition: transform 0.2s; }
-    #calculate { background: #B1614E; color: #fff; border: none; padding: 0.8rem 1.2rem; }
-    #calculate:hover:not(:disabled) { transform: translateY(-2px); background: #9C4A3F; }
-    #calculate:disabled { opacity: 0.5; cursor: not-allowed; }
-    .secondary { background: transparent; border: 1px solid #C3B4A2; color: #3A3A3A; padding: 0.6rem 1rem; }
-    .secondary:hover { background: #f0f0f0; }
-    #download { display: none; margin-left: 1rem; }
-    #showSettings { position: absolute; top: 1rem; right: 1rem; }
-    /* Decorative shapes */
-    .decor { position: absolute; pointer-events: none; opacity: 0.45; }
-    .circle { width:60px; height:60px; background:#B1614E; border-radius:50%; top:1rem; right:1rem; }
-    .square { width:40px; height:40px; background:#C3B4A2; bottom:1rem; left:1rem; transform:rotate(15deg); }
-    .triangle { width:0; height:0; border-left:30px solid transparent; border-right:30px solid transparent; border-bottom:50px solid #3A3A3A; top:50%; left:-30px; transform:translateY(-50%); }
-    .hexagon { width:50px; height:28.87px; background:#B1614E; clip-path: polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); top:50%; right:-25px; transform:translateY(-50%); }
-    /* Results */
-    #results { margin-top: 1.5rem; opacity: 0; max-height: 0; overflow: hidden; transition: all 0.5s; }
-    #results.show { opacity: 1; max-height: 200px; }
-    #results p, #results h2 { margin-bottom: 0.5rem; }
-    #results h2 { font-size: 1.25rem; }
-    /* Settings Panel */
-    .settings-panel { display: none; }
-    #settings { position: fixed; top: 0; right: -100%; width: 320px; height: 100%; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 12px 0 0 12px; padding: 2rem; transition: right 0.3s; z-index: 100; }
-    #settings.active { display: block; right: 0; }
-    #settings h2 { font-size: 1.5rem; margin-bottom: 1rem; }
-    #closeSettings { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-    #settings .field { margin-bottom: 1rem; }
-    #settings-buttons { display: flex; justify-content: space-between; margin-top: 1rem; }
-    #settings-buttons button { width: 48%; }
-    /* Toast */
-    #toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 200; }
-    .toast { background: #3A3A3A; color: #fff; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; opacity: 0; transform: translateX(100%); animation: slideIn 0.5s forwards, fadeOut 0.5s 3s forwards; }
-    @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateX(100%); } }
-    /* Responsive */
-    @media (max-width: 600px) {
-      .container { grid-template-columns: 1fr; }
-      .form-card, #settings { padding: 1rem; }
-      button { width: 100%; margin: 0.5rem 0; }
-      #download { margin-left: 0; }
-    }
-    .form-card {
-      position: relative;
-      overflow: hidden;
-      /* existing styles… */
-    }
-    .form-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      /* two overlaid 45° micro‑gradients to simulate wool‑noise */
-      background:
-        linear-gradient(
-          45deg,
-          rgba(0,0,0,0.03) 25%,
-          transparent 25%,
-          transparent 75%,
-          rgba(0,0,0,0.03) 75%,
-          rgba(0,0,0,0.03) 100%
-        ),
-        linear-gradient(
-          45deg,
-          rgba(0,0,0,0.03) 25%,
-          transparent 25%,
-          transparent 75%,
-          rgba(0,0,0,0.03) 75%,
-          rgba(0,0,0,0.03) 100%
-        );
-      background-size: 4px 4px, 4px 4px;  /* tweak these for denser or lighter noise */
-      opacity: 0.05;                      /* subtle texture */
-      pointer-events: none;
-      z-index: 1;
-    }
+<style>
+  /* Reset & Base */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: serif;
+    background: #F5F0E6;
+    color: #3A3A3A;
+    line-height: 1.4;
+    transition: background 0.3s, color 0.3s;
+  }
 
-  </style>
+  /* Dark Mode */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: #2E2E2E;
+      color: #EEE;
+    }
+    .form-card, .settings-panel {
+      background: #3A3A3A;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+    }
+    input[type=number], select {
+      background: #555;
+      border-color: #777;
+      color: #EEE;
+    }
+    input:focus, select:focus {
+      border-color: #B1614E;
+    }
+    .secondary {
+      border-color: #777;
+      color: #EEE;
+    }
+    .secondary:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    #showSettings {
+      color: #EEE;
+    }
+  }
+
+  /* Layout */
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .form-card, .settings-panel {
+    position: relative;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 2rem;
+    overflow: hidden;
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+
+  /* Texture Overlay */
+  .form-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(45deg, rgba(0,0,0,0.03) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.03) 75%, rgba(0,0,0,0.03) 100%),
+      linear-gradient(45deg, rgba(0,0,0,0.03) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.03) 75%, rgba(0,0,0,0.03) 100%);
+    background-size: 4px 4px, 4px 4px;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Typography */
+  h1 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    transition: color 0.3s;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+  }
+
+  .field {
+    margin-bottom: 1rem;
+  }
+
+  input[type=number], select {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #C3B4A2;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  input:focus, select:focus {
+    border-color: #B1614E;
+    outline: none;
+  }
+
+  .error-text {
+    color: #B1614E;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+
+  /* Buttons */
+  button {
+    font: inherit;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.2s, background 0.3s;
+    position: relative;
+  }
+
+  #calculate {
+    background: #B1614E;
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    overflow: hidden;
+  }
+
+  /* Icon transition */
+  #calculate::after {
+    content: ' ✨';
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  #calculate:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: #9C4A3F;
+  }
+
+  #calculate:hover::after {
+    opacity: 1;
+  }
+
+  #calculate:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .secondary {
+    background: transparent;
+    border: 1px solid #C3B4A2;
+    color: #3A3A3A;
+    padding: 0.6rem 1rem;
+  }
+
+  .secondary:hover {
+    background: #f0f0f0;
+  }
+
+  #download {
+    display: none;
+    margin-left: 1rem;
+  }
+
+  #showSettings {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: #3A3A3A;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  /* Decorative shapes */
+  .decor {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.45;
+  }
+
+  .circle {
+    width: 60px;
+    height: 60px;
+    background: #B1614E;
+    border-radius: 50%;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .square {
+    width: 40px;
+    height: 40px;
+    background: #C3B4A2;
+    bottom: 1rem;
+    left: 1rem;
+    transform: rotate(15deg);
+  }
+
+  .triangle {
+    width: 0;
+    height: 0;
+    border-left: 30px solid transparent;
+    border-right: 30px solid transparent;
+    border-bottom: 50px solid #3A3A3A;
+    top: 50%;
+    left: -30px;
+    transform: translateY(-50%);
+  }
+
+  .hexagon {
+    width: 50px;
+    height: 28.87px;
+    background: #B1614E;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    top: 50%;
+    right: -25px;
+    transform: translateY(-50%);
+  }
+
+  /* Results */
+  #results {
+    margin-top: 1.5rem;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s;
+  }
+
+  #results.show {
+    opacity: 1;
+    max-height: 200px;
+  }
+
+  #results p, #results h2 {
+    margin-bottom: 0.5rem;
+  }
+
+  #results h2 {
+    font-size: 1.25rem;
+  }
+
+  /* Settings Panel with slide-in */
+  #settings {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 320px;
+    height: 100%;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 12px 0 0 12px;
+    padding: 2rem;
+    z-index: 100;
+    transition: right 0.4s ease;
+  }
+
+  #settings.active {
+    right: 0;
+  }
+
+  #settings h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  #closeSettings {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  #closeSettings:hover {
+    transform: rotate(90deg);
+  }
+
+  #settings .field {
+    margin-bottom: 1rem;
+  }
+
+  #settings-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+
+  #settings-buttons button {
+    width: 48%;
+  }
+
+  /* Toast */
+  #toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 200; }
+  .toast {
+    background: #3A3A3A;
+    color: #fff;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    transform: translateX(100%);
+    animation: slideIn 0.5s forwards, fadeOut 0.5s 3s forwards;
+  }
+
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fadeOut {
+    to { opacity: 0; transform: translateX(100%); }
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .container { grid-template-columns: 1fr; }
+    .form-card, #settings { padding: 1rem; }
+    button { width: 100%; margin: 0.5rem 0; }
+    #download { margin-left: 0; }
+    #showSettings { font-size: 1rem; top: 0.75rem; right: 0.75rem; }
+  }
+  .settings-button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background-color: #B1614E;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.settings-button:hover {
+  background-color: #984a3a;
+}
+
+@media (max-width: 600px) {
+  .settings-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+}
+</style>
 </head>
 <body>
   <div class="container">
