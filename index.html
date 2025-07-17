@@ -386,7 +386,7 @@
   /* Toast */
   #toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 2000; }
   .toast {
-    background-color: rgba(24, 24, 27, 0.5);
+    background-color: rgba(24, 24, 27, 0.2);
     color: #fff;
     padding: 0.5rem 0.8rem;
     border-radius: 8px;
@@ -724,7 +724,16 @@
             final = subtotal + profit + (rushOrder==='yes'?subtotal*0.25:0);
 
       const quoteData = {
-        timestamp: new Date().toISOString(),
+        const timestamp = new Date().toLocaleString("en-KE", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+          timeZone: "Africa/Nairobi"
+        });,
         size: `${length}×${width}`,
         complexity,
         pile: pileType,
