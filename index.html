@@ -233,9 +233,9 @@
   }
 
   .circle {
-    width: 80px;
-    height: 80px;
-    background: #B1614E;
+    width: 70px;
+    height: 70px;
+    background: #8B5E3C;
     border-radius: 50%;
     top: 1rem;
     right: 1rem;
@@ -244,28 +244,36 @@
   .square {
     width: 70px;
     height: 70px;
-    background: #8B5E3C;
-    bottom: 1rem;
-    left: 2rem;
+    background: #708238;
+    border-radius: 15%;
+    top: 20%;
+    left: -2rem;
     transform: rotate(15deg);
   }
 
   .triangle {
-    width: 0;
-    height: 0;
-    border-left: 50px solid transparent;
-    border-right: 50px solid transparent;
-    border-bottom: 70px solid #708238;
-    top: 20%;
-    left: -30px;
-    transform: translateY(-50%);
+    width: 75px;
+    height: 56px;
+    background: #8B5E3C;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    transform: rotate(-15deg);
+    left: 3rem;
+    bottom: 9rem;
   }
 
   .hexagon {
     width: 70px;
     height: 58.87px;
     background: #B8B8B8;
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    clip-path: polygon(
+      25% 0%,
+      75% 0%,
+      100% 50%,
+      75% 100%,
+      25% 100%,
+      0% 50%
+    );
+    border-radius: 15%;
     top: 45%;
     right: -25px;
     transform: translateY(-50%);
@@ -378,7 +386,7 @@
   /* Toast */
   #toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 200; }
   .toast {
-    background: #B8B8B8;
+    background: #3A3A3A;
     color: #fff;
     padding: 0.75rem 1rem;
     border-radius: 8px;
@@ -574,7 +582,7 @@
         <span class="result-value" id="resMaterials"></span>
       </div>
       <div class="result-card">
-        <span class="result-label">Overhead:</span>
+        <span class="result-label">With Overhead (20%):</span>
         <span class="result-value" id="resOverhead"></span>
       </div>
       <div class="result-card">
@@ -604,7 +612,7 @@
       </div>
       <div class="field">
         <label for="gluePer750ml">Glue (Ksh per 750ml)</label>
-        <input id="gluePer750ml" type="number" value="800">
+        <input id="gluePer750ml" type="number" value="450">
       </div>
       <div class="field">
         <label for="glueUsage">Glue Usage (ml/m²)</label>
@@ -616,11 +624,11 @@
       </div>
       <div class="field">
         <label for="miscCost">Miscellaneous (Ksh)</label>
-        <input id="miscCost" type="number" value="100">
+        <input id="miscCost" type="number" value="300">
       </div>
       <div class="field">
         <label for="hourlyRate">Hourly Rate (Ksh)</label>
-        <input id="hourlyRate" type="number" value="350">
+        <input id="hourlyRate" type="number" value="375">
       </div>
       <div id="settings-buttons">
         <button id="saveSettings" class="secondary">Save</button>
