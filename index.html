@@ -134,18 +134,18 @@
         <label for="rush">Rush Order</label>
         <select id="rush" aria-label="Rush order">
           <option value="no" selected>No</option>
-          <option value="yes">Yes (+25%)</option>
+          <option value="yes">Yes</option>
         </select>
       </div>
       <button id="calculate" disabled>Calculate</button>
       <button id="download" class="secondary">Download PDF</button>
       <button id="showSettings" class="secondary">Settings</button>
       <div id="results" role="region" aria-live="polite">
-        <p>Base Materials: <span id="resMaterials">KSh 0</span></p>
-        <p>With Overhead (40%): <span id="resOverhead">KSh 0</span></p>
-        <p>Labor Cost: <span id="resLabor">KSh 0</span></p>
-        <p>Profit: <span id="resProfit">KSh 0</span></p>
-        <h2>FINAL QUOTE: <span id="resFinal">KSh 0</span></h2>
+        <p>Base Materials: <span id="resMaterials">Ksh 0</span></p>
+        <p>With Overhead (40%): <span id="resOverhead">Ksh 0</span></p>
+        <p>Labor Cost: <span id="resLabor">Ksh 0</span></p>
+        <p>Profit: <span id="resProfit">Ksh 0</span></p>
+        <h2>FINAL QUOTE: <span id="resFinal">Ksh 0</span></h2>
       </div>
     </div>
   </div>
@@ -154,15 +154,15 @@
     <button id="closeSettings" aria-label="Close settings">×</button>
     <h2 id="settings-title">Settings</h2>
     <div class="field">
-      <label for="tuftCloth">Tuft Cloth (KSh/m²)</label>
+      <label for="tuftCloth">Tuft Cloth (Ksh/m²)</label>
       <input id="tuftCloth" type="number" value="1000">
     </div>
     <div class="field">
-      <label for="yarn">Yarn (KSh/skein)</label>
+      <label for="yarn">Yarn (Ksh/skein)</label>
       <input id="yarn" type="number" value="100">
     </div>
     <div class="field">
-      <label for="gluePer750ml">Glue (KSh per 750ml)</label>
+      <label for="gluePer750ml">Glue (Ksh per 750ml)</label>
       <input id="gluePer750ml" type="number" value="450">
     </div>
     <div class="field">
@@ -170,15 +170,15 @@
       <input id="glueUsage" type="number" value="500">
     </div>
     <div class="field">
-      <label for="backing">Backing (KSh/m²)</label>
+      <label for="backing">Backing (Ksh/m²)</label>
       <input id="backing" type="number" value="400">
     </div>
     <div class="field">
-      <label for="miscCost">Miscellaneous (KSh)</label>
+      <label for="miscCost">Miscellaneous (Ksh)</label>
       <input id="miscCost" type="number" value="300">
     </div>
     <div class="field">
-      <label for="hourlyRate">Hourly Rate (KSh)</label>
+      <label for="hourlyRate">Hourly Rate (Ksh)</label>
       <input id="hourlyRate" type="number" value="375">
     </div>
     <div id="settings-buttons">
@@ -252,7 +252,7 @@
       const glueCost = (glueUsagePerM2 * areaM2 / 750) * gluePricePer750ml;
       const backingCost = areaM2 * backing;
       const baseMat = tuftClothCost + yarnCost + glueCost + backingCost + misc;
-      const withOH = baseMat * 1.4;
+      const withOH = baseMat * 1.2;
       const timeEstimates = { simple:2, medium:4, complex:6 };
       const experienceMultipliers = { beginner:1.3, intermediate:1.2, advanced:1 };
       const profitMargins = { simple:0.15, medium:0.2, complex:0.25 };
@@ -273,11 +273,11 @@
       }
     }
     function displayResults({materials, overhead, labor, profit, finalPrice}) {
-      $('resMaterials').textContent = `KSh ${materials.toFixed(0)}`;
-      $('resOverhead').textContent = `KSh ${overhead.toFixed(0)}`;
-      $('resLabor').textContent = `KSh ${labor.toFixed(0)}`;
-      $('resProfit').textContent = `KSh ${profit.toFixed(0)}`;
-      $('resFinal').textContent = `KSh ${finalPrice.toFixed(0)}`;
+      $('resMaterials').textContent = `Ksh ${materials.toFixed(0)}`;
+      $('resOverhead').textContent = `Ksh ${overhead.toFixed(0)}`;
+      $('resLabor').textContent = `Ksh ${labor.toFixed(0)}`;
+      $('resProfit').textContent = `Ksh ${profit.toFixed(0)}`;
+      $('resFinal').textContent = `Ksh ${finalPrice.toFixed(0)}`;
       $('results').classList.add('show');
       $('download').style.display = 'inline-block';
     }
