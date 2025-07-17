@@ -714,7 +714,7 @@
       const glueCost = (glueUsagePerM2 * areaM2 / 750) * gluePricePer750ml;
       const backingCost = areaM2 * backing;
       const baseMat = tuftClothCost + yarnCost + glueCost + backingCost + misc;
-      const withOH = baseMat * 1.1;
+      const withOH = baseMat * 1.15;
       const timeEstimates = { simple:2, medium:4, complex:6 };
       const experienceMultipliers = { beginner:1.3, intermediate:1.2, advanced:1 };
       const profitMargins = { simple:0.1, medium:0.15, complex:0.2 };
@@ -723,7 +723,7 @@
             labor = totalTime * hourlyRate;
       const subtotal = withOH + labor,
             profit = subtotal * profitMargins[complexity],
-            final = subtotal + profit + (rushOrder==='yes'?subtotal*0.25:0);
+            final = subtotal + profit + (rushOrder==='yes'?subtotal*0.4:0);
       const timestamp = new Date().toLocaleString("en-KE", {
         year: "numeric",
         month: "short",
