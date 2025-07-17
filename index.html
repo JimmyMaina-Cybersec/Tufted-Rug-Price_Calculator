@@ -722,18 +722,19 @@
       const subtotal = withOH + labor,
             profit = subtotal * profitMargins[complexity],
             final = subtotal + profit + (rushOrder==='yes'?subtotal*0.25:0);
-
+      const timestamp = new Date().toLocaleString("en-KE", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+        timeZone: "Africa/Nairobi"
+      });
+      
       const quoteData = {
-        const timestamp = new Date().toLocaleString("en-KE", {
-          year: "numeric",
-          month: "short",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true,
-          timeZone: "Africa/Nairobi"
-        });,
+        timestamp,
         size: `${length}×${width}`,
         complexity,
         pile: pileType,
