@@ -389,9 +389,10 @@
     background: #1C1C1C;
     color: #fff;
     padding: 0.5rem 0.8rem;
-    border-radius: 7px;
+    border-radius: 8px;
     margin-bottom: 0.5rem;
-    opacity: 0;
+    opacity: 0.2;
+    z-index: 999;
     transform: translateX(100%);
     animation: slideIn 0.5s forwards, fadeOut 0.5s 3s forwards;
   }
@@ -714,7 +715,7 @@
       const withOH = baseMat * 1.1;
       const timeEstimates = { simple:2, medium:4, complex:6 };
       const experienceMultipliers = { beginner:1.3, intermediate:1.2, advanced:1 };
-      const profitMargins = { simple:0.15, medium:0.2, complex:0.25 };
+      const profitMargins = { simple:0.1, medium:0.15, complex:0.2 };
       const baseTuft = timeEstimates[complexity],
             totalTime = (baseTuft + 1 + 2) * experienceMultipliers[experience],
             labor = totalTime * hourlyRate;
@@ -765,13 +766,85 @@
       $('results').classList.add('show');
       $('download').style.display = 'inline-block';
     }
-
+    
     async function downloadPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.text(`Final Quote: ${$('resFinal').textContent}`, 20, 20);
+      const paddingX = 20;
+      let cursorY = 20;
+      const lineHeight = 8;
+    
+      // Helper function to add sections with spacing
+      const addSection = (title, lines = []) => {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.text(title, paddingX, cursorY);
+        cursorY += lineHeight;
+    
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        lines.forEach(line => {
+          doc.text(line, paddingX + 4, cursorY);
+          cursorY += lineHeight;
+        });
+    
+        cursorY += lineHeight / 2;
+      };
+    
+      // Get user inputs
+      const complexity = document.getElementById('complexity').value;
+      const pileType = document.getElementById('pile').value;
+      const rush = document.getElementById('rush').value;
+      const finalQuote = document.getElementById('resFinal').textContent.trim();
+    
+      // Define complexity map
+      const complexityMap = {
+        simple: "10%",
+        medium: "15%",
+        complex: "20%",
+      };
+    
+      // Section 1: Material Costs
+      addSection("✅ 1. Material Costs", [
+        "• Tufting Cloth: +15% waste allowance",
+        `• Yarn: ${pileType === "cut" ? "High" : "Low"} usage (${pileType} pile)`,
+        "• Glue: Calculated by area (750ml bottle size)",
+        "• Backing: Directly based on rug size"
+      ]);
+    
+      // Section 2: Overhead
+      addSection("🏢 2. Business & Overhead", [
+        "• Covers workspace, electricity, tools & handling",
+        "• Fixed, fair, and transparent"
+      ]);
+    
+      // Section 3: Labor
+      addSection("💼 3. Labor Costs", [
+        `• Based on your selected design complexity: ${complexity}`,
+        "• Setup time: 1 hour",
+        "• Finishing time: 2 hours"
+      ]);
+    
+      // Section 4: Profit
+      addSection("💰 4. Profit Margin", [
+        `• Applied based on complexity (${complexityMap[complexity]})`
+      ]);
+    
+      // Section 5: Rush Order
+      if (rush === "yes") {
+        addSection("⚡️ 5. Rush Order", [
+          "• +25% surcharge for fast-tracked delivery"
+        ]);
+      }
+    
+      // Final Quote
+      addSection("📊 Final Quote", [
+        `Total Price: ${finalQuote}`
+      ]);
+    
+      // Save PDF
       doc.save('TuftedRugQuote.pdf');
-      showNotification('PDF downloaded!','success');
+      showNotification('PDF downloaded!', 'success');
     }
 
     // --- Settings Panel Toggle ---
