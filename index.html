@@ -1,272 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tufted Rug Pricing Calculator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tufted Rug Quote Tool</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
+    /* Reset & Base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: serif; background: #F5F0E6; color: #3A3A3A; line-height: 1.4; }
+    .container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+    .form-card, .settings-panel { position: relative; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 2rem; overflow: hidden; }
+    h1 { font-size: 1.75rem; margin-bottom: 1rem; }
+    label { display: block; margin-bottom: 0.25rem; font-size: 0.9rem; }
+    .field { margin-bottom: 1rem; }
+    input[type=number], select { width: 100%; padding: 0.6rem; border: 1px solid #C3B4A2; border-radius: 8px; font-size: 1rem; }
+    input:focus, select:focus { border-color: #B1614E; outline: none; }
+    .error-text { color: #B1614E; font-size: 0.8rem; margin-top: 0.25rem; }
+    button { font: inherit; cursor: pointer; border-radius: 8px; transition: transform 0.2s; }
+    #calculate { background: #B1614E; color: #fff; border: none; padding: 0.8rem 1.2rem; }
+    #calculate:hover:not(:disabled) { transform: translateY(-2px); background: #9C4A3F; }
+    #calculate:disabled { opacity: 0.5; cursor: not-allowed; }
+    .secondary { background: transparent; border: 1px solid #C3B4A2; color: #3A3A3A; padding: 0.6rem 1rem; }
+    .secondary:hover { background: #f0f0f0; }
+    #download { display: none; margin-left: 1rem; }
+    #showSettings { position: absolute; top: 1rem; right: 1rem; }
+    /* Decorative shapes */
+    .decor { position: absolute; pointer-events: none; opacity: 0.45; }
+    .circle { width:60px; height:60px; background:#B1614E; border-radius:50%; top:1rem; right:1rem; }
+    .square { width:40px; height:40px; background:#C3B4A2; bottom:1rem; left:1rem; transform:rotate(15deg); }
+    .triangle { width:0; height:0; border-left:30px solid transparent; border-right:30px solid transparent; border-bottom:50px solid #3A3A3A; top:50%; left:-30px; transform:translateY(-50%); }
+    .hexagon { width:50px; height:28.87px; background:#B1614E; clip-path: polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); top:50%; right:-25px; transform:translateY(-50%); }
+    /* Results */
+    #results { margin-top: 1.5rem; opacity: 0; max-height: 0; overflow: hidden; transition: all 0.5s; }
+    #results.show { opacity: 1; max-height: 200px; }
+    #results p, #results h2 { margin-bottom: 0.5rem; }
+    #results h2 { font-size: 1.25rem; }
+    /* Settings Panel */
+    .settings-panel { display: none; }
+    #settings { position: fixed; top: 0; right: -100%; width: 320px; height: 100%; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 12px 0 0 12px; padding: 2rem; transition: right 0.3s; z-index: 100; }
+    #settings.active { display: block; right: 0; }
+    #settings h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+    #closeSettings { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+    #settings .field { margin-bottom: 1rem; }
+    #settings-buttons { display: flex; justify-content: space-between; margin-top: 1rem; }
+    #settings-buttons button { width: 48%; }
+    /* Toast */
+    #toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 200; }
+    .toast { background: #3A3A3A; color: #fff; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; opacity: 0; transform: translateX(100%); animation: slideIn 0.5s forwards, fadeOut 0.5s 3s forwards; }
+    @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeOut { to { opacity: 0; transform: translateX(100%); } }
+    /* Responsive */
+    @media (max-width: 600px) {
+      .container { grid-template-columns: 1fr; }
+      .form-card, #settings { padding: 1rem; }
+      button { width: 100%; margin: 0.5rem 0; }
+      #download { margin-left: 0; }
     }
-    .container {
-      background: white;
-      border-radius: 15px;
-      padding: 30px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    .form-card {
+      position: relative;
+      overflow: hidden;
+      /* existing styles… */
     }
-    h1, h2, h3 {
-      color: #2c3e50;
+    .form-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      /* two overlaid 45° micro‑gradients to simulate wool‑noise */
+      background:
+        linear-gradient(
+          45deg,
+          rgba(0,0,0,0.03) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(0,0,0,0.03) 75%,
+          rgba(0,0,0,0.03) 100%
+        ),
+        linear-gradient(
+          45deg,
+          rgba(0,0,0,0.03) 25%,
+          transparent 25%,
+          transparent 75%,
+          rgba(0,0,0,0.03) 75%,
+          rgba(0,0,0,0.03) 100%
+        );
+      background-size: 4px 4px, 4px 4px;  /* tweak these for denser or lighter noise */
+      opacity: 0.05;                      /* subtle texture */
+      pointer-events: none;
+      z-index: 1;
     }
-    .settings-section, .input-section, .results-section {
-      margin-bottom: 30px;
-      border-radius: 10px;
-      padding: 20px;
-    }
-    .settings-section {
-      background: #f0f4f8;
-      border-left: 5px solid #e67e22;
-    }
-    .settings-section input {
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-    }
-    .input-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .input-group {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      border: 2px solid #e9ecef;
-      transition: border-color 0.3s;
-    }
-    .input-group:hover {
-      border-color: #3498db;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-      color: #34495e;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-    .calculate-btn, .save-settings-btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 25px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: transform 0.3s;
-      display: inline-block;
-      margin-top: 10px;
-    }
-    .calculate-btn:hover, .save-settings-btn:hover {
-      transform: translateY(-2px);
-    }
-    .results-section {
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-      color: white;
-    }
-    .results-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-    }
-    .result-item {
-      background: rgba(255,255,255,0.2);
-      padding: 15px;
-      border-radius: 8px;
-      backdrop-filter: blur(10px);
-    }
-    .final-price {
-      background: rgba(255,255,255,0.3);
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      margin-top: 20px;
-    }
-    @media (max-width: 768px) {
-      .input-section, .results-grid {
-        grid-template-columns: 1fr;
-      }
-    }
+
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🧵 Tufted Rug Pricing Calculator</h1>
-
-    <!-- SETTINGS PANEL -->
-    <div class="settings-section">
-      <h2>⚙️ Settings</h2>
-      <label>Tuft Cloth (KSh/m²): <input type="number" id="tuftCloth" value="1000"></label>
-      <label>Yarn (KSh/skein): <input type="number" id="yarn" value="100"></label>
-      <label>Glue (KSh per 750ml): <input type="number" id="gluePer750ml" value="450"></label>
-      <label>Glue Usage (ml/m²): <input type="number" id="glueUsage" value="500"></label>
-      <label>Backing (KSh/m²): <input type="number" id="backing" value="400"></label>
-      <label>Miscellaneous (KSh): <input type="number" id="miscCost" value="300"></label>
-      <label>Hourly Rate (KSh): <input type="number" id="hourlyRate" value="375"></label>
-    </div>
-
-    <!-- ORDER INPUTS -->
-    <div class="input-section">
-      <div class="input-group"><label>Length (ft)</label><input type="number" id="length" value="3"></div>
-      <div class="input-group"><label>Width (ft)</label><input type="number" id="width" value="2"></div>
-      <div class="input-group"><label>Complexity</label><select id="complexity"><option value="simple">Simple</option><option value="medium" selected>Medium</option><option value="complex">Complex</option></select></div>
-      <div class="input-group"><label>Pile Type</label><select id="pile"><option value="loop">Loop</option><option value="cut" selected>Cut</option></select></div>
-      <div class="input-group"><label>Experience</label><select id="experience"><option value="beginner">Beginner</option><option value="intermediate" selected>Intermediate</option><option value="advanced">Advanced</option></select></div>
-      <div class="input-group"><label>Rush Order</label><select id="rush"><option value="no" selected>No</option><option value="yes">Yes</option></select></div>
-    </div>
-    <button class="calculate-btn" onclick="calculatePrice()">Calculate & Log Quote</button>
-    <button class="calculate-btn" onclick="downloadPDF()">Download PDF</button>
-
-    <!-- RESULTS -->
-    <div class="results-section" id="results" style="display:none;">
-      <h2>💰 Results</h2>
-      <div class="results-grid">
-        <div class="result-item"><div>Base Materials</div><div id="baseMaterials"></div></div>
-        <div class="result-item"><div>With Overhead</div><div id="withOverhead"></div></div>
-        <div class="result-item"><div>Labor Cost</div><div id="laborCost"></div></div>
-        <div class="result-item"><div>Profit</div><div id="profit"></div></div>
+    <div class="form-card" role="form" aria-labelledby="tool-title">
+      <div class="decor circle"></div>
+      <div class="decor square"></div>
+      <div class="decor triangle"></div>
+      <div class="decor hexagon"></div>
+      <h1 id="tool-title">Tufted Rug Quote Tool</h1>
+      <div class="field">
+        <label for="length">Length (ft)</label>
+        <input id="length" type="number" step="0.1" min="0.1" aria-required="true" aria-label="Length in feet">
       </div>
-      <div class="final-price"><h3>FINAL PRICE</h3><div id="finalPrice" style="font-size:32px;"></div></div>
+      <div class="field">
+        <label for="width">Width (ft)</label>
+        <input id="width" type="number" step="0.1" min="0.1" aria-required="true" aria-label="Width in feet">
+      </div>
+      <div class="field">
+        <label for="complexity">Complexity</label>
+        <select id="complexity" aria-label="Rug complexity">
+          <option value="simple">Simple</option>
+          <option value="medium" selected>Medium</option>
+          <option value="complex">Complex</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="pile">Pile Type</label>
+        <select id="pile" aria-label="Pile type">
+          <option value="cut" selected>Cut</option>
+          <option value="loop">Loop</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="experience">Experience</label>
+        <select id="experience" aria-label="Experience level">
+          <option value="beginner">Beginner</option>
+          <option value="intermediate" selected>Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rush">Rush Order</label>
+        <select id="rush" aria-label="Rush order">
+          <option value="no" selected>No</option>
+          <option value="yes">Yes (+25%)</option>
+        </select>
+      </div>
+      <button id="calculate" disabled>Calculate</button>
+      <button id="download" class="secondary">Download PDF</button>
+      <button id="showSettings" class="secondary">Settings</button>
+      <div id="results" role="region" aria-live="polite">
+        <p>Base Materials: <span id="resMaterials">KSh 0</span></p>
+        <p>With Overhead (40%): <span id="resOverhead">KSh 0</span></p>
+        <p>Labor Cost: <span id="resLabor">KSh 0</span></p>
+        <p>Profit: <span id="resProfit">KSh 0</span></p>
+        <h2>FINAL QUOTE: <span id="resFinal">KSh 0</span></h2>
+      </div>
     </div>
   </div>
 
+  <div id="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <button id="closeSettings" aria-label="Close settings">×</button>
+    <h2 id="settings-title">Settings</h2>
+    <div class="field">
+      <label for="tuftCloth">Tuft Cloth (KSh/m²)</label>
+      <input id="tuftCloth" type="number" value="1000">
+    </div>
+    <div class="field">
+      <label for="yarn">Yarn (KSh/skein)</label>
+      <input id="yarn" type="number" value="100">
+    </div>
+    <div class="field">
+      <label for="gluePer750ml">Glue (KSh per 750ml)</label>
+      <input id="gluePer750ml" type="number" value="450">
+    </div>
+    <div class="field">
+      <label for="glueUsage">Glue Usage (ml/m²)</label>
+      <input id="glueUsage" type="number" value="500">
+    </div>
+    <div class="field">
+      <label for="backing">Backing (KSh/m²)</label>
+      <input id="backing" type="number" value="400">
+    </div>
+    <div class="field">
+      <label for="miscCost">Miscellaneous (KSh)</label>
+      <input id="miscCost" type="number" value="300">
+    </div>
+    <div class="field">
+      <label for="hourlyRate">Hourly Rate (KSh)</label>
+      <input id="hourlyRate" type="number" value="375">
+    </div>
+    <div id="settings-buttons">
+      <button id="saveSettings" class="secondary">Save</button>
+      <button id="cancelSettings" class="secondary">Cancel</button>
+    </div>
+  </div>
+
+  <div id="toast-container" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
+    // --- Utility & Constants ---
+    const SHEETS_WEBHOOK_URL = 'YOUR_SHEETS_WEBHOOK_URL';
+    function $(id){return document.getElementById(id);}
+    function showNotification(message, type='success') {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = message;
+      $('toast-container').appendChild(t);
+      setTimeout(() => t.remove(), 4000);
+    }
+    function validateInput(id, name, min=0) {
+      const el = $(id), val = parseFloat(el.value);
+      el.nextElementSibling?.classList?.contains('error-text') && el.nextElementSibling.remove();
+      if (isNaN(val) || val < min) {
+        const e = document.createElement('div'); e.className='error-text'; e.textContent=`${name} must be ≥ ${min}`;
+        el.after(e);
+        return false;
+      }
+      return true;
+    }
+    function validateAllInputs() {
+      return [
+        validateInput('tuftCloth','Tuft Cloth'),
+        validateInput('yarn','Yarn'),
+        validateInput('gluePer750ml','Glue Price'),
+        validateInput('glueUsage','Glue Usage'),
+        validateInput('backing','Backing'),
+        validateInput('miscCost','Miscellaneous Cost'),
+        validateInput('hourlyRate','Hourly Rate'),
+        validateInput('length','Length',0.1),
+        validateInput('width','Width',0.1)
+      ].every(v=>v);
+    }
+
+    // --- Calculation & Display ---
     async function calculatePrice() {
-      const length = parseFloat(document.getElementById('length').value);
-      const width = parseFloat(document.getElementById('width').value);
-      const complexity = document.getElementById('complexity').value;
-      const pileType = document.getElementById('pile').value;
-      const experience = document.getElementById('experience').value;
-      const rushOrder = document.getElementById('rush').value;
-
-      const tuftCloth = parseFloat(document.getElementById('tuftCloth').value);
-      const yarn = parseFloat(document.getElementById('yarn').value);
-      const gluePricePer750ml = parseFloat(document.getElementById('gluePer750ml').value);
-      const glueUsagePerM2 = parseFloat(document.getElementById('glueUsage').value);
-      const backing = parseFloat(document.getElementById('backing').value);
-      const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
-      const misc = parseFloat(document.getElementById('miscCost').value);
-
-      const areaFt = length * width;
-      const areaM2 = areaFt * 0.092903;
-
+      if (!validateAllInputs()) {
+        showNotification('Please correct input errors before calculating.','error');
+        return;
+      }
+      const length = parseFloat($('length').value),
+            width = parseFloat($('width').value),
+            complexity = $('complexity').value,
+            pileType = $('pile').value,
+            experience = $('experience').value,
+            rushOrder = $('rush').value;
+      const tuftCloth = +$('tuftCloth').value,
+            yarn = +$('yarn').value,
+            gluePricePer750ml = +$('gluePer750ml').value,
+            glueUsagePerM2 = +$('glueUsage').value,
+            backing = +$('backing').value,
+            hourlyRate = +$('hourlyRate').value,
+            misc = +$('miscCost').value;
+      const areaFt = length * width,
+            areaM2 = areaFt * 0.092903;
       const tuftClothCost = areaM2 * tuftCloth * 1.15;
-      const yarnCoverage = pileType === 'cut' ? 0.2 : 0.3;
+      const yarnCoverage = pileType==='cut'?0.2:0.3;
       const yarnCost = (areaFt / yarnCoverage) * yarn;
       const glueCost = (glueUsagePerM2 * areaM2 / 750) * gluePricePer750ml;
       const backingCost = areaM2 * backing;
       const baseMat = tuftClothCost + yarnCost + glueCost + backingCost + misc;
-      const withOH = baseMat * 1.2;
-
-      const timeEstimates = { simple: 2, medium: 4, complex: 6 };
-      const experienceMultipliers = { beginner: 1.3, intermediate: 1.2, advanced: 1 };
-      const profitMargins = { simple: 0.15, medium: 0.2, complex: 0.25 };
-
-      const baseTuft = timeEstimates[complexity];
-      const time = (baseTuft + 2.5 + 0.5) * experienceMultipliers[experience];
-      const labor = time * hourlyRate;
-
-      const subtotal = withOH + labor;
-      const profit = subtotal * profitMargins[complexity];
-      const final = subtotal + profit + (rushOrder === 'yes' ? subtotal * 0.25 : 0);
-
-      const quoteData = {
-        timestamp: new Date().toISOString(),
-        size: `${length}×${width}`,
-        complexity,
-        pile: pileType,
-        experience,
-        rush: rushOrder,
-        materials: Math.round(baseMat),
-        overhead: Math.round(withOH - baseMat),
-        labor: Math.round(labor),
-        profit: Math.round(profit),
-        finalPrice: Math.round(final)
-      };
-
-      displayResults(quoteData);
-
+      const withOH = baseMat * 1.4;
+      const timeEstimates = { simple:2, medium:4, complex:6 };
+      const experienceMultipliers = { beginner:1.3, intermediate:1.2, advanced:1 };
+      const profitMargins = { simple:0.15, medium:0.2, complex:0.25 };
+      const baseTuft = timeEstimates[complexity],
+            totalTime = (baseTuft + 2.5 + 0.5) * experienceMultipliers[experience],
+            labor = totalTime * hourlyRate;
+      const subtotal = withOH + labor,
+            profit = subtotal * profitMargins[complexity],
+            final = subtotal + profit + (rushOrder==='yes'?subtotal*0.25:0);
+      displayResults({ materials: baseMat, overhead: withOH-baseMat, labor, profit, finalPrice: final });
+      showNotification('Calculation successful!','success');
+      // Logging
       try {
-        console.log("Sending quote data:", JSON.stringify(quoteData));
-        await fetch('https://script.google.com/macros/s/AKfycbxDMvcUYur1uTmWMlVzEfjEzosIZcFdsSeA7O_dXZuFAYFNe9rKXKWMPvKWqwNKkxo9/exec', {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(quoteData)
-        });
-      } catch (err) {
-        console.error('Error logging to Sheets', err);
+        const res = await fetch(SHEETS_WEBHOOK_URL, { method:'POST', body: JSON.stringify({ length, width, final }) });
+        showNotification(res.ok?'Quote saved successfully!':'Quote saved locally only','success');
+      } catch(e) {
+        showNotification('Quote calculated but not saved.','error');
       }
     }
-
-    function displayResults(data) {
-      document.getElementById('results').style.display = 'block';
-      document.getElementById('baseMaterials').textContent = `KSh ${data.materials.toLocaleString()}`;
-      document.getElementById('withOverhead').textContent = `KSh ${data.overhead.toLocaleString()}`;
-      document.getElementById('laborCost').textContent = `KSh ${data.labor.toLocaleString()}`;
-      document.getElementById('profit').textContent = `KSh ${data.profit.toLocaleString()}`;
-      document.getElementById('finalPrice').textContent = `KSh ${data.finalPrice.toLocaleString()}`;
+    function displayResults({materials, overhead, labor, profit, finalPrice}) {
+      $('resMaterials').textContent = `KSh ${materials.toFixed(0)}`;
+      $('resOverhead').textContent = `KSh ${overhead.toFixed(0)}`;
+      $('resLabor').textContent = `KSh ${labor.toFixed(0)}`;
+      $('resProfit').textContent = `KSh ${profit.toFixed(0)}`;
+      $('resFinal').textContent = `KSh ${finalPrice.toFixed(0)}`;
+      $('results').classList.add('show');
+      $('download').style.display = 'inline-block';
     }
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text(`Final Quote: ${$('resFinal').textContent}`, 20, 20);
+      doc.save('TuftedRugQuote.pdf');
+      showNotification('PDF downloaded!','success');
+    }
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+      $('calculate').addEventListener('click', calculatePrice);
+      $('download').addEventListener('click', downloadPDF);
+      $('showSettings').addEventListener('click', () => $('settings').classList.add('active'));
+      $('closeSettings').addEventListener('click', () => $('settings').classList.remove('active'));
+      $('cancelSettings').addEventListener('click', () => $('settings').classList.remove('active'));
+      $('saveSettings').addEventListener('click', () => { $('settings').classList.remove('active'); showNotification('Settings saved!','success'); });
+      // real-time validation
+      document.querySelectorAll('input[type=number]').forEach(i => i.addEventListener('input', () => {
+        $('calculate').disabled = !validateAllInputs();
+      }));
+    });
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-  async function downloadPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    const length = document.getElementById('length').value;
-    const width = document.getElementById('width').value;
-    const complexity = document.getElementById('complexity').value;
-    const pile = document.getElementById('pile').value;
-    const experience = document.getElementById('experience').value;
-    const rush = document.getElementById('rush').value;
-
-    const base = document.getElementById('baseMaterials').textContent;
-    const overhead = document.getElementById('withOverhead').textContent;
-    const labor = document.getElementById('laborCost').textContent;
-    const profit = document.getElementById('profit').textContent;
-    const final = document.getElementById('finalPrice').textContent;
-
-    const lines = [
-      '🧵 Tufted Rug Quote',
-      '-------------------------',
-      `Size: ${length} × ${width} ft`,
-      `Complexity: ${complexity}`,
-      `Pile Type: ${pile}`,
-      `Experience: ${experience}`,
-      `Rush Order: ${rush}`,
-      '',
-      `Base Materials: ${base}`,
-      `With Overhead: ${overhead}`,
-      `Labor: ${labor}`,
-      `Profit: ${profit}`,
-      '-------------------------',
-      `Final Price: ${final}`,
-    ];
-
-    lines.forEach((line, i) => doc.text(line, 20, 20 + i * 10));
-
-    doc.save(`TuftedRug_Quote_${Date.now()}.pdf`);
-  }
-</script>
 </body>
 </html>
