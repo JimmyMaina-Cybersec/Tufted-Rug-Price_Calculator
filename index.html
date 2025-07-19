@@ -745,7 +745,7 @@
         materials: Math.round(baseMat),
         overhead: Math.round(withOH - baseMat),
         labor: Math.round(labor),
-        laborHours: Math.round(totalTime),
+        laborHours: Math.round(totalTime * 10) / 10,
         profit: Math.round(profit),
         finalPrice: Math.round(final)
       };
