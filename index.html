@@ -708,9 +708,10 @@
             misc = +$('miscCost').value;
       const areaFt = length * width,
             areaM2 = areaFt * 0.092903;
-      const tuftClothCost = areaM2 * tuftCloth * 1.15;
+      const tuftClothCost = areaM2 * tuftCloth;
       const yarnCoverage = pileType==='cut'?0.2:0.3;
-      const yarnCost = (areaFt / yarnCoverage) * yarn;
+      const skeinsNeeded = areaFt * yarnCoverage; // ft² × (skeins/ft²) = total skeins
+      const yarnCost = skeinsNeeded * yarn; // skeins × price per skein = total cost
       const glueCost = (glueUsagePerM2 * areaM2 / 750) * gluePricePer750ml;
       const backingCost = areaM2 * backing;
       const baseMat = tuftClothCost + yarnCost + glueCost + backingCost + misc;
