@@ -592,10 +592,13 @@
         <span class="result-label">Labor Cost:</span>
         <span class="result-value" id="resLabor"></span>
       </div>
+      <!-- COMMENTED OUT: Profit display in UI -->
+      <!--
       <div class="result-card">
         <span class="result-label">Profit:</span>
         <span class="result-value" id="resProfit"></span>
       </div>
+      -->
       <div class="result-card final">
         <span class="result-label">Final Quote:</span>
         <span class="result-value" id="resFinal"></span>
@@ -719,13 +722,17 @@
       const withOH = withWaste * 1.15;
       const timeEstimates = { simple:1.5, medium:2, complex:4.5 };
       const experienceMultipliers = { beginner:1.3, intermediate:1.2, advanced:1 };
-      const profitMargins = { simple:0.25, medium:0.35, complex:0.45 };
+      // COMMENTED OUT: Profit margin calculations
+      // const profitMargins = { simple:0.25, medium:0.35, complex:0.45 };
       const baseTuft = timeEstimates[complexity],
             totalTime = (baseTuft + 0.5 + 3) * experienceMultipliers[experience],
             labor = totalTime * hourlyRate;
-      const subtotal = withOH + labor,
-            profit = subtotal * profitMargins[complexity],
-            final = subtotal + profit + (rushOrder==='yes'?subtotal*0.4:0);
+      // COMMENTED OUT: Profit calculation
+      // profit = subtotal * profitMargins[complexity],
+      
+      // COMMENTED OUT: Adding profit to final calculation
+      // final = subtotal + profit + (rushOrder==='yes'?subtotal*0.4:0);
+      const final = subtotal + (rushOrder==='yes'?subtotal*0.4:0);
       const timestamp = new Date().toLocaleString("en-KE", {
         year: "numeric",
         month: "short",
@@ -748,7 +755,8 @@
         overhead: Math.round(withOH - baseMat),
         labor: Math.round(labor),
         laborHours: Math.round(totalTime * 10) / 10,
-        profit: Math.round(profit),
+        // COMMENTED OUT: Profit in quote data
+        // profit: Math.round(profit),
         finalPrice: Math.round(final)
       };
 
@@ -771,11 +779,10 @@
       }
     }
     
-    function displayResults({ materials, overhead, labor, profit, finalPrice }) {
+    function displayResults({ materials, overhead, labor, finalPrice }) {
       $('resMaterials').textContent = `Ksh ${materials.toLocaleString()}`;
       $('resOverhead').textContent = `Ksh ${overhead.toLocaleString()}`;
       $('resLabor').textContent = `Ksh ${labor.toLocaleString()}`;
-      $('resProfit').textContent = `Ksh ${profit.toLocaleString()}`;
       $('resFinal').textContent = `Ksh ${finalPrice.toLocaleString()}`;
       
       $('results').classList.add('show');
@@ -813,11 +820,12 @@
       const finalQuote = document.getElementById('resFinal').textContent.trim();
     
       // Define complexity map
-      const complexityMap = {
-        simple: "10%",
-        medium: "15%",
-        complex: "20%",
-      };
+      // COMMENTED OUT: Complexity map for profit margins
+      // const complexityMap = {
+      //   simple: "10%",
+      //   medium: "15%",
+      //   complex: "20%",
+      // };
     
       // Section 1: Material Costs
       addSection("✅ 1. Material Costs", [
@@ -841,9 +849,10 @@
       ]);
     
       // Section 4: Profit
-      addSection("💰 4. Profit Margin", [
-        `• Applied based on complexity (${complexityMap[complexity]})`
-      ]);
+      // COMMENTED OUT: Section 4: Profit
+      // addSection("💰 4. Profit Margin", [
+      //   `• Applied based on complexity (${complexityMap[complexity]})`
+      // ]);
     
       // Section 5: Rush Order
       if (rush === "yes") {
