@@ -732,6 +732,7 @@
       
       // COMMENTED OUT: Adding profit to final calculation
       // final = subtotal + profit + (rushOrder==='yes'?subtotal*0.4:0);
+      const subtotal = withOH + labor;
       const final = subtotal + (rushOrder==='yes'?subtotal*0.4:0);
       const timestamp = new Date().toLocaleString("en-KE", {
         year: "numeric",
